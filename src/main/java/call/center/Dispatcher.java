@@ -24,18 +24,22 @@ public class Dispatcher implements Runnable {
         this.calls = new ConcurrentLinkedDeque<>(call);
         this.employees = new ConcurrentLinkedDeque<>(employees);
         executorService = Executors.newFixedThreadPool(MAX_NUMBER_OF_CALLS);
-
     }
 
-    private synchronized void dispatchCall() {
-        if (!this.calls.isEmpty()) {
-            Call call = this.getOneCall();
-            try{
-                Employee employee = this.employeeAvailableStrategy.findEmployee(this.getEmployees());
-                executorService.execute(() -> employee.attend(call));
-            } catch (FindEmployeeAvailableError e) {
-                this.addFirst(call);
-            }
+
+    /**
+     *
+     * Receive a call, find a free employee, if you do not find it, stack the call again
+     *
+     * @param call
+     */
+    private synchronized void dispatchCall(Call call) {
+
+        try {
+            Employee employee = this.employeeAvailableStrategy.findEmployee(this.getEmployees());
+            executorService.execute(() -> employee.attend(call));
+        } catch (FindEmployeeAvailableError e) {
+            this.addFirst(call);
         }
     }
 
@@ -53,8 +57,11 @@ public class Dispatcher implements Runnable {
 
     @Override
     public void run() {
-        while (!calls.isEmpty()) {
-               this.dispatchCall();
+        while (true) {
+            if (!this.calls.isEmpty()) {
+                Call call = this.getOneCall();
+                this.dispatchCall(call);
+            }
         }
     }
 }

@@ -33,9 +33,15 @@ public abstract class Employee  {
         return name;
     }
 
+
+    /**
+     *
+     * Receives a call, answers it, then marks that the call was answered and the employee is enabled again
+     *
+     * @param call
+     */
     public void attend(Call call){
         if (call != null) {
-            this.setState(EmployeeState.BUSY);
             logger.info("this employee: {} attending call with {} seconds", this.getName(), call.getDuration());
             try {
                 TimeUnit.SECONDS.sleep(call.getDuration());

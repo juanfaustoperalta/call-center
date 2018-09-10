@@ -12,6 +12,14 @@ import java.util.stream.Collectors;
 
 public class EmployeeAvailableStrategy {
 
+    /**
+     *
+     * Find the first free operator, otherwise continues with supervisors and finally with directors
+     *
+     * @param employees
+     * @return employee
+     */
+
     public synchronized Employee findEmployee(Collection<Employee> employees) {
         List<Employee> availableEmployees = employees.stream().filter(e -> e.getEmployeeState().equals(EmployeeState.AVAILABLE)).collect(Collectors.toList());
         Optional<Employee> optionalEmployee = this.getOptionalEmployee(availableEmployees, EmployeeType.OPERATOR);
